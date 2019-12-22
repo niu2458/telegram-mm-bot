@@ -34,10 +34,13 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
     #Show welcome message if /start is sent
     @bot.on(events.NewMessage(pattern="/start"))
     async def guide(event):
-        peer_type = type(await bot.get_input_entity(event.from_id)) #get peer type
-        #Should not be called from a chat or channel
-        if peer_type != types.InputUser:
-            return        
+        #Should not be called in a group or supergroup
+        if type(event.to_id) != types.PeerUser:
+            return  
+        
+        #Should not be called from a bot either
+        if (await bot(functions.users.GetFullUserRequest(event.from_id))).user.bot:
+            return
         
         #Send a welcome message at first
         await event.reply("""
@@ -47,7 +50,7 @@ you with managing your group. No Ads, No nothing.
 In order to activate me follow these steps:
     1.Add me to your group and promote me to admin.
         
-    2.Send /activate <Your group id without t.me/> back to me.
+    2.Send __/activate <Your group id without t.me/>__ back to me.
     
     If you do both of these steps right you will get an 
     acknowledge message in the group.
@@ -55,18 +58,18 @@ In order to activate me follow these steps:
     
     #Activate a group also verify that referring 
     #peer is a user.
-    @bot.on(events.NewMessage("/activate"))
-    async def activate_gp(event):
-        sender_input = await utils.get_input_peer(event.from_id) #message sender's input entity
+    #@bot.on(events.NewMessage("/activate"))
+    #async def activate_gp(event):
+        #sender_input = event.to_id #message sender's input entity
         
-        peer_type = type(sender_input)
-        #Should not be activated from a chat or channel
-        if peer_type != types.InputUser:
-            return
+        #peer_type = type(sender_input)
+        ##Should not be activated from a chat or channel
+        #if peer_type != types.InputUser:
+            #return
         
-        #Should not be called by a bot either
-        if (await bot(functions.users.GetFullUserRequest(sender_input))).is_bot:
-            return
+        ##Should not be called by a bot either
+        #if (await bot(functions.users.GetFullUserRequest(sender_input))).is_bot:
+            #return
         
         
     
