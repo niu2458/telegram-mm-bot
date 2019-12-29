@@ -25,6 +25,14 @@ persistence, that means they are kept even if the bot is restarted.
 """
 CHATS = []
 
+"""
+This dictionary contains "GroupPrefs" class for each chat that is 
+registered, this can be later used to fetch the GroupPrefs class
+of each chat.
+
+"""
+PREFERENCES = {} 
+
 DEBUG = True #debug flag
 
 #the very main loop
@@ -157,8 +165,6 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
             await event.reply("If you want to activate a group send:\n__/activate <Your group username without t.me/>__")
             return
         
-        CHATS.append(group_name)
-        
         #Test for admin priviledges and send acknowledgements.
         self_status = httpmethods.get_chat_member_status(group_name, 
                                                       BOT_TOKEN.split()[0],
@@ -168,7 +174,11 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
             await event.reply("Done! I will send an acknowledge message in the group too.")
         else:
             await event.reply("Woops! Looks like I'm either not joined/promoted in the group!")        
-    
+            return
+        
+        CHATS.append(group_name)
+        #Create a GroupPrefs class for the chat
+        PREFERENCES[group_name] = local_files.GroupPrefs(group_name)
     
     #Show welcome message if /start is sent
     @bot.on(events.NewMessage(pattern="/start"))
