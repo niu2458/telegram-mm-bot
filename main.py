@@ -7,16 +7,20 @@ Project's github link: https://github.com/AryanGHM/telegram-gp-bot
 from telethon import TelegramClient, events, utils, types
 from telethon.tl import functions
 import logging
-from gp import core, httpmethods
+from gp import core, httpmethods, local_files
 
-API_ID = 1121112
-API_HASH =  "4e339ace3887950cdcda6a45d0d1fe93"
-BOT_TOKEN = "1006932084:AAGhTF6wk6aXvb8wHDQ6pJm_OFlAntRzYeA"
+API_ID = local_files.get_api_id()
+API_HASH =  local_files.get_api_hash()
+BOT_TOKEN = local_files.get_bot_token()
 
 """
 We will only manage these chats. The events will only trigger
 when messages are recieved from these chats. This is our white
 list indeed.
+
+Each of these chats have a "Group Preference" files, which contains 
+preferences of these groups. These files are unique and they are 
+persistence, that means they are kept even if the bot is restarted.
 
 """
 CHATS = []
@@ -38,13 +42,12 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
     indeed activated it.
     """
     
-    #set logging debug messages if debug is enabled
+    #set logging level to debug if debug is enabled.
     #set DEBUG to False if you want it disabled.
     if DEBUG:
         logging.basicConfig(level=logging.DEBUG)
             
-    #This function verifies that a channel
-    #is in CHATS whitelist or not
+    #This function verifies that a channel is in CHATS whitelist or not
     #:param telethon.types.PeerChannel channel: the channel to verify
     async def verify_whitelist(channel):
         # get username of channel
@@ -63,8 +66,74 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
         #Verify the input peer with whitelist
         if not (await verify_whitelist(event.to_id)):
             return
-            
+        
+        #forward
         await core.lockchat(event, bot)
+    
+    @bot.on(events.NewMessage(pattern='/unlockchat'))
+    async def uchat(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.unlockchat(event, bot)
+    
+    @bot.on(events.NewMessage(pattern='/lockmedia'))
+    async def lmedia(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.lockmedia(event, bot)
+    
+    @bot.on(events.NewMessage(pattern='/unlockmedia'))
+    async def umedia(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.unlockmedia(event, bot)    
+    
+    @bot.on(events.NewMessage(pattern='/lockgif'))
+    async def lgif(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.lockgif(event, bot)
+    
+    @bot.on(events.NewMessage(pattern='/unlockgif'))
+    async def ugif(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.unlockgif(event, bot)  
+        
+    @bot.on(events.NewMessage(pattern='/locksticker'))
+    async def lsticker(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.locksticker(event, bot)    
+        
+    @bot.on(events.NewMessage(pattern='/unlocksticker'))
+    async def usticker(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.unlocksticker(event, bot)   
+        
+
     
     """ ~EVENTS """
     

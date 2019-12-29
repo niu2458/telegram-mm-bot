@@ -26,14 +26,26 @@ with it.
 
 """ EVENT HANDLERS """
 
-#Lock the chat, forwarded to gp.actions.lockchat
-#Unlock the chat forwarded to gp.actions.unlockchat
 async def lockchat(event, bot):
     await actions.lockchat(event, bot)
 
 async def unlockchat(event, bot):
     await actions.unlockchat(event, bot)
 
+async def lockmedia(event, bot):
+    await actions.lockmedia(event, bot)
+
+async def unlockmedia(event, bot):
+    await actions.unlockmedia(event, bot)
+
+async def lockgif(event, bot):
+    await actions.lockgif(event, bot)
+async def unlockgif(event, bot):
+    await actions.unlockgif(event, bot)
+async def locksticker(event, bot):
+    await actions.locksticker(event, bot)
+async def unlocksticker(event, bot):
+    await actions.unlocksticker(event, bot)
 
 """ ~EVENT HANDLERS """
 
