@@ -8,6 +8,7 @@ from telethon import TelegramClient, events, utils, types
 from telethon.tl import functions
 import logging
 from gp import core, httpmethods, local_files
+from gp import utils as gp_utils
 
 API_ID = local_files.get_api_id()
 API_HASH =  local_files.get_api_hash()
@@ -140,9 +141,47 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
         
         #forward
         await core.unlocksticker(event, bot)   
-        
 
+    @bot.on(events.NewMessage(pattern='/warn'))
+    async def warn(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward 
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+
+        await core.warn(event, bot, PREFERENCES[channel_username]) 
+        
+    @bot.on(events.NewMessage(pattern='/dewarn'))
+    async def dewarn(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+        
+        await core.dewarn(event, bot, PREFERENCES[channel_username]) 
     
+    @bot.on(events.NewMessage(pattern='/ban'))
+    async def ban(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.ban(event, bot) 
+        
+    @bot.on(events.NewMessage(pattern='/unban'))
+    async def unban(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.unban(event, bot) 
+        
     """ ~EVENTS """
     
     #Activate a group also verify that referring peer is a user.

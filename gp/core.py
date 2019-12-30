@@ -25,7 +25,11 @@ with it.
 """ 
 
 """ EVENT HANDLERS """
-
+""" RESTRICTORS """
+async def ban(event, bot):
+    await actions.ban(event, bot)
+async def unban(event, bot):
+    await actions.unban(event, bot)
 async def lockchat(event, bot):
     await actions.lockchat(event, bot)
 
@@ -46,6 +50,16 @@ async def locksticker(event, bot):
     await actions.locksticker(event, bot)
 async def unlocksticker(event, bot):
     await actions.unlocksticker(event, bot)
+""" ~RESTRICTORS """
+
+""" WARNING FUCNTIONS """
+async def warn(event, bot, group_prefs):
+    await actions.warn(event, bot, group_prefs)
+
+async def dewarn(event, bot, group_prefs):
+    await actions.dewarn(event, bot, group_prefs)
+
+""" ~WARNING FUNCTIONS """
 
 """ ~EVENT HANDLERS """
 

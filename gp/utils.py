@@ -5,6 +5,9 @@ Project's github link: https://github.com/AryanGHM/telegram-gp-bot
 
 """
 from telethon import TelegramClient, functions
+import pysqlite3 as sql
+
+WARNINGS_MAIN_TABLE = "warnings"
 
 """
 Get username of a channel from it's peer (eg. Message.to_id)
@@ -16,3 +19,124 @@ Get username of a channel from it's peer (eg. Message.to_id)
 """
 async def get_channel_username(bot, channel):
     return (await bot(functions.channels.GetChannelsRequest([channel]))).chats[0].username
+
+"""
+Warning database functions, 
+All warnings are stored in "warnings" table.In the format of:
+
+user_id | warning_count
+
+"""
+def open_warning_db(path):
+    conn = sql.connect(path)
+    
+    if conn:
+        cursor = conn.cursor()
+    else:
+        raise RuntimeError("Could not connect to a db: " + path)
+    
+    cursor.execute(""" CREATE TABLE IF NOT EXISTS {}(
+                                            user_id integer NOT NULL,
+                                            warn_count integer
+                                            );
+                                            """.format(WARNINGS_MAIN_TABLE)
+        )     
+    
+    return conn
+
+def increase_warn(warn_db_path, user_id, count, max_warn):
+    #count of warnings should not exceed max warning count
+    #and should not be less than 0
+    if count < 0:
+        count = 0
+    elif count > max_warn:
+        count = max_warn
+        
+    conn = open_warning_db(warn_db_path)
+    cur = conn.cursor()
+    
+    #update if there is already a row in the db for user
+    cur.execute("SELECT * FROM {0} WHERE user_id={1}".format(WARNINGS_MAIN_TABLE, str(user_id)))
+    rows = cur.fetchall()
+    
+    if len(rows) < 1:
+        #create a row 
+        sql = '''INSERT INTO {0}(user_id, warn_count) VALUES({1}, {2})'''.format(WARNINGS_MAIN_TABLE, str(user_id), str(count))
+                
+        cur.execute(sql)
+        conn.commit()        
+    elif len(rows) > 1:
+        raise RuntimeError("The user {0} has more than one row in the {1} database".format(str(user_id), str(warn_db)))
+    
+    elif len(rows) == 1:
+        #update the row
+        warn_count = rows[0][1]
+        
+        #we are going to increase the value of warnings
+        count += int(warn_count)
+        if count > max_warn:
+            count = max_warn
+    
+        sql = '''UPDATE {0}
+             SET warn_count={2} WHERE user_id={1}'''.format(WARNINGS_MAIN_TABLE, str(user_id), str(count))
+    
+        cur.execute(sql)
+        conn.commit()          
+
+def decrease_warn(warn_db_path, user_id, count, max_warn):
+    #count of warnings should not exceed max warning count
+    #and should not be less than 0
+    if count < 0:
+        count = 0
+    elif count > max_warn:
+        count = max_warn
+        
+    conn = open_warning_db(warn_db_path)
+    cur = conn.cursor()
+    
+    #update if there is already a row in the db for user
+    cur.execute("SELECT * FROM {0} WHERE user_id={1}".format(WARNINGS_MAIN_TABLE, str(user_id)))
+    rows = cur.fetchall()
+    
+    if len(rows) < 1:
+        #create a row 
+        sql = '''INSERT INTO {0}(user_id, warn_count) VALUES({1}, {2})'''.format(WARNINGS_MAIN_TABLE, str(user_id), "0")
+                
+        cur.execute(sql)
+        conn.commit()        
+    elif len(rows) > 1:
+        #each user should only have 1 row in the db
+        raise RuntimeError("The user {0} has more than one row in the {1} database".format(str(user_id), str(warn_db_path)))
+    elif len(rows) == 1:
+        #update the row
+        warn_count = rows[0][1]
+        
+        #we are going to decrease the value of warnings
+        count = int(warn_count) - count
+        if count < 0:
+            count = 0
+    
+        sql = '''UPDATE {0}
+             SET warn_count={2} WHERE user_id={1}'''.format(WARNINGS_MAIN_TABLE, str(user_id), str(count))
+    
+        cur.execute(sql)
+        conn.commit()         
+    
+def get_warn(warn_db_path, user_id):
+    conn = open_warning_db(warn_db_path)
+    cur = conn.cursor()
+    
+    #update if there is already a row in the db for user
+    cur.execute("SELECT * FROM {0} WHERE user_id={1}".format(WARNINGS_MAIN_TABLE, str(user_id)))
+    rows = cur.fetchall()
+    
+    #if there's no row in the db for the user it basically
+    #doesn't have any warnings
+    if len(rows) < 1:
+        return 0
+    elif len(rows) == 1:
+        return rows[0][1]
+    else:
+        #if a user has more than 1 row in the db something went wrong
+        raise RuntimeError("The user {0} has more than one row in the {1} database".format(str(user_id), str(warn_db_path)))
+    

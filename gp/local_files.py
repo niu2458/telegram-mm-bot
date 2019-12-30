@@ -60,25 +60,29 @@ class GroupPrefs:
             
             self.config["WARNINGS"]["WARN_DB"] = db_path
             
+            #Set group names values
+            self.config["GROUP_NAMES"] = {"NAME": groupname}
+            
             #write the configs to file
             with open(self.file_name, "w") as configfile:
                 self.config.write(configfile)
         
-        #Read the config file and update the self.config field with
-        #that.
-        def read(self):
-            self.config = configparser.ConfigParser().read(self.file_name)
-        
-        #Return warnings database
-        def get_warn_db_path(self):
-            self.read() #get latest updates
-            return self.config["WARNINGS"]["WARN_DB"]
-        
-        #Return max warning count in int
-        def get_max_warn(self):
-            self.read() #get latest updates
-            return self.config["WARNINGS"]["MAX_WARN"]
-        
+    #Read the config file and update the self.config field with
+    #that.
+    def read(self):
+        self.config = configparser.ConfigParser()
+        self.config.read(self.file_name)
+    
+    #Return warnings database
+    def get_warn_db_path(self):
+        self.read() #get latest updates
+        return self.config["WARNINGS"]["WARN_DB"]
+    
+    #Return max warning count in int
+    def get_max_warn(self):
+        self.read() #get latest updates
+        return int(self.config["WARNINGS"]["MAX_WARN"])
+
 """
 Get api id from credentials.ini file
 
