@@ -113,3 +113,22 @@ def get_bot_token():
     except IndexError:
         raise RuntimeError("Invalid credential configuration file, visit https://github.com/AryanGHM/telegram-gp-bot for more information.")
 
+"""
+Read the GroupPrefs folder for any group preferences 
+Designed to only be called from "main.py" file in the
+project's root directory.
+
+"""
+def recover_sess():
+    CHATS = []
+    
+    #crawl the whole GroupPrefs directory
+    for f in os.listdir('GroupPrefs'):
+        if f.endswith('.grprf'):
+            #create a tuple with it's name and a GroupPrefs object of it
+            f = f.replace('.grprf', '')
+            prefs = GroupPrefs(f)
+            #create a list of all group preferences and names
+            CHATS.append((f, prefs))
+    
+    return CHATS

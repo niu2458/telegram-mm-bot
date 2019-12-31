@@ -55,7 +55,14 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
     #set DEBUG to False if you want it disabled.
     if DEBUG:
         logging.basicConfig(level=logging.DEBUG)
-            
+    
+    #recover chats from last run by their .grprf files
+    SAVED_CHATS = local_files.recover_sess()
+    
+    for f, pref in SAVED_CHATS:
+        CHATS.append(f)
+        PREFERENCES[f] = pref
+    
     #This function verifies that a channel is in CHATS whitelist or not
     #:param telethon.types.PeerChannel channel: the channel to verify
     async def verify_whitelist(channel):
