@@ -34,6 +34,13 @@ are set to the group name + db and the sqlite file extension.Databases are store
 
 """
 class GroupPrefs:
+    """
+    Filter names in the group preferences files
+    
+    """
+    locklink = "LOCK_LINK"
+    lockfwd = "LOCK_FORWARD"
+    
     def __init__(self, groupname):
         if groupname.endswith(".grprf"):
             self.file_name = groupname
@@ -63,15 +70,25 @@ class GroupPrefs:
             #Set group names values
             self.config["GROUP_NAMES"] = {"NAME": groupname}
             
+            #Set filters config values
+            self.config["FILTERS"] = {self.lockfwd: "1",# enabled by default
+                                      self.locklink: "1"# enabled by default
+                                      }
+            
             #write the configs to file
             with open(self.file_name, "w") as configfile:
                 self.config.write(configfile)
-        
+    
     #Read the config file and update the self.config field with
     #that.
     def read(self):
         self.config = configparser.ConfigParser()
         self.config.read(self.file_name)
+    
+    #Fetch the group's name
+    def get_gp_name(self):
+        self.read() #update to latest
+        return self.config["GROUP_NAMES"]["NAME"]
     
     #Return warnings database
     def get_warn_db_path(self):
@@ -82,7 +99,35 @@ class GroupPrefs:
     def get_max_warn(self):
         self.read() #get latest updates
         return int(self.config["WARNINGS"]["MAX_WARN"])
-
+    
+    """
+    Filters getter and setter methods.
+    
+    """
+    def get_filter(self, filter_name):
+        self.read() #get latest updates
+        try:
+            return self.config["FILTERS"][filter_name] 
+        except IndexError:
+            return #just a wrong key
+    
+    #set a boolean value to a filter
+    def set_filter(self, filter_name, value):
+        try:
+            if value:
+                self.config["FILTERS"][filter_name] = "1"
+            else:
+                self.config["FILTERS"][filter_name] = "0"
+            
+            #write to config file
+            with open(self.file_name, 'w') as f:
+                self.config.write(f)
+            
+            self.read() #update the config object
+        except IndexError:
+            return #just a wrong key
+             
+             
 """
 Get api id from credentials.ini file
 
@@ -117,6 +162,8 @@ def get_bot_token():
 Read the GroupPrefs folder for any group preferences 
 Designed to only be called from "main.py" file in the
 project's root directory.
+
+Returns a list of tuples each of which 
 
 """
 def recover_sess():

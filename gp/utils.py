@@ -5,6 +5,8 @@ Project's github link: https://github.com/AryanGHM/telegram-gp-bot
 
 """
 from telethon import TelegramClient, functions
+from telethon.tl import types
+from telethon.utils import resolve_id
 import pysqlite3 as sql
 
 WARNINGS_MAIN_TABLE = "warnings"
@@ -139,4 +141,34 @@ def get_warn(warn_db_path, user_id):
     else:
         #if a user has more than 1 row in the db something went wrong
         raise RuntimeError("The user {0} has more than one row in the {1} database".format(str(user_id), str(warn_db_path)))
+
+""" 
+Get access hash of a channel from it's username
+
+"""
+async def get_access_hash(bot, channel_username):
+    resp = await bot(functions.contacts.ResolveUsernameRequest(channel_username))
+    return resp.chats[0].access_hash    
+
+#delete a message with message_id from the channel that is specified channel_username
+async def delete_message(bot, message_id, channel_username):
+    #get channel's input peer with access hash and it's channel id 
+    channel_id = resolve_id(await bot.get_peer_id(await bot.get_input_entity(channel_username)))[0]
+    access_hash = await get_access_hash(bot, channel_username)
     
+    channel_peer = types.InputPeerChannel(channel_id, access_hash)
+    #create the request then send it
+    request = functions.channels.DeleteMessagesRequest(channel_peer, [message_id])
+    await bot(request)    
+
+#ban a user by a message from him/her
+async def ban_by_msg(msg):
+    try:
+        await bot.edit_permissions(await bot.get_input_entity(event.to_id),
+                                                       await bot.get_input_entity(event.from_id), 
+                                                       view_messages=False,
+                                                       )    
+        
+        return True
+    except Exception:
+        return False

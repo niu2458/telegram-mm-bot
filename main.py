@@ -72,11 +72,54 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
             return True
         else:
             return False
-        
     
     
     """ EVENTS """
     
+    @bot.on(events.NewMessage(pattern="/unlockfwd"))
+    async def uforward(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward 
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+
+        await core.unlockforward(event, bot, PREFERENCES[channel_username])         
+        
+    @bot.on(events.NewMessage(pattern="/unlocklnk"))
+    async def ulink(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward 
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+
+        await core.unlocklink(event, bot, PREFERENCES[channel_username]) 
+        
+    @bot.on(events.NewMessage(pattern="/lockfwd"))
+    async def lforward(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward 
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+
+        await core.lockforward(event, bot, PREFERENCES[channel_username]) 
+
+    @bot.on(events.NewMessage(pattern="/locklnk"))
+    async def llink(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward 
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+
+        await core.locklink(event, bot, PREFERENCES[channel_username])         
+        
     @bot.on(events.NewMessage(pattern="/lockchat"))
     async def lchat(event):
         #Verify the input peer with whitelist
@@ -189,6 +232,16 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
         #forward
         await core.unban(event, bot) 
         
+    @bot.on(events.NewMessage())
+    async def validate(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+
+        #forward 
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+
+        await core.validate(event, bot, PREFERENCES[channel_username])     
     """ ~EVENTS """
     
     #Activate a group also verify that referring peer is a user.
