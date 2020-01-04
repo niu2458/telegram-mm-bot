@@ -28,6 +28,8 @@ Finally in the project's root directory:
 # Source code Documentation
 To change the source code consider just looking at it, basically, events first land in _main.py_ and then they are forwarded to _gp.core_ module and finally from core module they are handled and forwarded to the desired module, wether it's _gp.actions_ or _gp.filtres_.
 
+Here I'm just going to tell you where to go for each task, the code is indeed very well documented and can guide you through.
+
 ### gp.filters
 _gp.filters_ module methods are called from _gp.core.validate_ method which is called when every new message is recieved, it checks if any of the filters have been set to True in order to forward the messsage object to the activated filter.
 
