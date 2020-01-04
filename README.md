@@ -9,6 +9,8 @@ Open source free group police bot with very basic functionalities, such as warni
 
 2. requests package, you can install this using pip.
 
+3.(optional) virtualenv installation, this is extremely recommended.
+
 Clone the repo: 
 > git clone https://github.com/AryanGHM/telegram-gp-bot/
 
