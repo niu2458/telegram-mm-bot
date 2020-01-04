@@ -36,6 +36,10 @@ PREFERENCES = {}
 
 DEBUG = True #debug flag
 
+#a message to show in the group that has been activated
+ACTIVATION_ACKNOWLEDGE_MESSAGE = \
+    "Group Police bot by Aryan Gholizadeh(email: aryghm@gmail.com) has been activated in this group.\nUse /help to get a list of commands.\nBot's source code: https://github.com/AryanGHM/telegram-gp-bot"
+
 #the very main loop
 with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
     """
@@ -76,6 +80,14 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
     
     """ EVENTS """
     
+    @bot.on(events.NewMessage(pattern="/help"))
+    async def lchat(event):
+        #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        
+        #forward
+        await core.showhelp(event, bot)    
     @bot.on(events.NewMessage(pattern="/unlockfwd"))
     async def uforward(event):
         #Verify the input peer with whitelist
@@ -264,12 +276,17 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
             await event.reply("If you want to activate a group send:\n__/activate <Your group username without t.me/>__")
             return
         
+        #check if the group is already activated.
+        if group_name in CHATS:
+            await event.reply("The group is already activated!")
+            return
+        
         #Test for admin priviledges and send acknowledgements.
         self_status = httpmethods.get_chat_member_status(group_name, 
                                                       BOT_TOKEN.split()[0],
                                                       BOT_TOKEN)   #first segment of bot api token seperated by ':' is the bot user id     
         if "administrator" in self_status:
-            await bot.send_message(group_name, "Group Police is successfully activated in your group.")
+            await bot.send_message(group_name, ACTIVATION_ACKNOWLEDGE_MESSAGE)
             await event.reply("Done! I will send an acknowledge message in the group too.")
         else:
             await event.reply("Woops! Looks like I'm either not joined/promoted in the group!")        

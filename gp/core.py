@@ -24,6 +24,44 @@ with it.
 
 """ 
 
+#A help message to help the admins with commands
+HELP_MESSAGE = \
+"""
+Group Police Bot help manual,
+
+Commands:
+/help: Show this message 
+
+/locklnk: Delete every message that contains links and warn the sender.
+/unlocklnk: Undo above
+
+/lockfwd: Delete every forwarded message and warn the sender.
+/unlockfwd: Undo above
+
+/ban: Ban the sender of the replied message, use /unban to unban the user so they can join by group's link.
+/unban: Unban a user, he will be able to join the group via link or be added by a normal member.
+
+/lockchat: Lock the chat for normal users (not admins).
+/unlockchat: Undo above
+
+/lockmedia: Lock media sharing (pics and videos) for normal users.
+/unlockmedia: Undo above
+
+/lockgif: Lock gif sharing for normal users.
+/unlockgif: Undo above
+
+/locksticker: Lock sticker sharing for normal users.
+/unlocksticker: Undo above.
+
+/warn: Warn the sender of the replied message. If the warning count of a user reaches maximum warnings he/she will be banned.
+/dewarn: Decrease 1 warn from the warnings of the replied message sender.
+/maxwarn __n__: Set maximum warning count to __n__
+
+
+Bot by Aryan Gholizadeh(email: aryghm@gmail.com), Source code at:
+https://github.com/AryanGHM/telegram-gp-bot
+"""
+
 BOT_TOKEN = local_files.get_bot_token()
 
 """ EVENT HANDLERS """
@@ -118,6 +156,11 @@ async def dewarn(event, bot, group_prefs):
     await actions.dewarn(event, bot, group_prefs)
 
 """ ~WARNING FUNCTIONS """
+
+""" OTHERS """ 
+async def showhelp(event, bot):
+    #show a help message for group admin to use the bot
+    await event.reply(HELP_MESSAGE)
 
 """ ~EVENT HANDLERS """
 
