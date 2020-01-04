@@ -122,6 +122,14 @@ async def validate(event, bot, group_prefs):
         await filters.filterforward(event, bot, group_prefs)
         
 """ RESTRICTORS """
+async def setmaxwarn(event, bot, group_prefs, max_warn):
+    if group_prefs.set_max_warn(max_warn):
+        #Done 
+        await event.reply("Maximum number of warnings has been set to {}".format(str(max_warn)))
+    else:
+        #Couldn't do
+        await event.reply("Couldn't set maximum number of warnings, probably a wrong value?")
+        
 async def ban(event, bot):
     await actions.ban(event, bot)
 async def unban(event, bot):

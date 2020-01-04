@@ -100,6 +100,22 @@ class GroupPrefs:
         self.read() #get latest updates
         return int(self.config["WARNINGS"]["MAX_WARN"])
     
+    #Set maximum warning count
+    def set_max_warn(self, max_warn):
+        try:
+            max_warn = str(max_warn)
+        except ValueError:
+            #wrong max_warn value, probably a str
+            return False
+        
+        if max_warn:
+            self.config["WARNINGS"]["MAX_WARN"] = max_warn
+        else:
+            #value is 0 and it's wrong
+            return False
+    
+        return True
+    
     """
     Filters getter and setter methods.
     

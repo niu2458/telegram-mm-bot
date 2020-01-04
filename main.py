@@ -80,8 +80,27 @@ with TelegramClient('bot', API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
     
     """ EVENTS """
     
+    @bot.on(events.NewMessage(pattern="/maxwarn"))
+    async def maxwarn(event):
+         #Verify the input peer with whitelist
+        if not (await verify_whitelist(event.to_id)):
+            return
+        #get argument from message
+        max_warn = 0
+        try:
+            max_warn = int(str(event.raw_text).split(' ')[1])
+        except ValueError:
+            #failed to convert to int
+            await event.reply("Please specify the maximum warnings count:\n/maxwarn __n__")
+            return
+        
+        #forward
+        channel_username = await gp_utils.get_channel_username(bot, event.to_id)
+        
+        await core.setmaxwarn(event, bot, PREFERENCES[channel_username], max_warn)     
+        
     @bot.on(events.NewMessage(pattern="/help"))
-    async def lchat(event):
+    async def help(event):
         #Verify the input peer with whitelist
         if not (await verify_whitelist(event.to_id)):
             return
