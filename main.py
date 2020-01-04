@@ -1,5 +1,5 @@
 """
-Main bot setups, add and create threads for groups
+Main bot setups, validate and forward events.
 Author: Aryan Gholizadeh:aryghm@gmail.com
 Project's github link: https://github.com/AryanGHM/telegram-gp-bot
 
